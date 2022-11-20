@@ -1,5 +1,7 @@
-﻿/// <summary>
-/// HiLow Game engine, bootstraps the necessary components needed for the game to run.
+﻿namespace Hilo.Core;
+
+/// <summary>
+/// The GameResult. Whether a winner was found, or some error occurred.
 /// </summary>
 public class GameResult
 {

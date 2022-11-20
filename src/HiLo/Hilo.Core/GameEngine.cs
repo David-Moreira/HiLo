@@ -1,4 +1,5 @@
-﻿/// <summary>
+﻿namespace Hilo.Core;
+/// <summary>
 /// HiLow Game engine, bootstraps the necessary components needed for the game to run.
 /// </summary>
 public class GameEngine
