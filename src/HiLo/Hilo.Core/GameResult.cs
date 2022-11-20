@@ -5,7 +5,7 @@
 /// </summary>
 public class GameResult
 {
-    public string Winner { get; set; }
+    public Player Winner { get; set; }
     public int Attempts { get; set; }
 
     public bool Error { get; set; }
@@ -15,7 +15,7 @@ public class GameResult
     public string ErrorMessage { get; set; }
 
 
-    public GameResult(string winner, int attempts)
+    public GameResult(Player winner, int attempts)
     {
         Winner = winner;
         Attempts = attempts;
@@ -31,7 +31,7 @@ public class GameResult
     public static GameResult EndWithError(GameErrorType errorType, string error)
         => new GameResult(errorType, error);
 
-    public static GameResult End(string winner, int attempts)
+    public static GameResult End(Player winner, int attempts)
      => new GameResult(winner, attempts);
 
 }

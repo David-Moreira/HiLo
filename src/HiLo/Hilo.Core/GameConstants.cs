@@ -1,4 +1,6 @@
-﻿namespace Hilo.Core;
+﻿using System.Collections.Generic;
+
+namespace Hilo.Core;
 
 /// <summary>
 /// Constants for the Game.
