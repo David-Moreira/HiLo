@@ -1,4 +1,5 @@
 ﻿namespace Hilo.Core;
+
 /// <summary>
 /// HiLow Game engine, bootstraps the necessary components needed for the game to run.
 /// </summary>
@@ -8,11 +9,13 @@ public class GameEngine
     private string ERROR_ABORTED = "Game was aborted.";
     private readonly IReadOnlyList<HiLoPlayer> _players;
     private readonly Action<string> _output;
+    private IMysteryNumberGenerator _mysteryNumberGenerator;
     private int _mysteryNumber;
     private int _nextPlayerIdx = 0;
 
-    public GameEngine(IReadOnlyList<HiLoPlayer> players, Action<string> Output)
+    public GameEngine(IMysteryNumberGenerator mysteryNumberGenerator, IReadOnlyList<HiLoPlayer> players, Action<string> Output)
     {
+        _mysteryNumberGenerator = mysteryNumberGenerator;
         _players = players;
         _output = Output;
     }
@@ -28,10 +31,10 @@ public class GameEngine
     {
         try
         {
-            _mysteryNumber = Random.Shared.Next(min, max);
-            
+            _mysteryNumber = _mysteryNumberGenerator.Generate(min, max);
+
             _players.ElementAt(_nextPlayerIdx);
-            
+
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)

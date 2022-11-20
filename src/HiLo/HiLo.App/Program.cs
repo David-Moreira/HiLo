@@ -1,4 +1,6 @@
-﻿using Hilo.Core;
+﻿using System.Security.Cryptography;
+
+using Hilo.Core;
 
 Console.WriteLine(Constants.NAME); 
 Console.WriteLine("Try to guess the mystery number in the less attempts possible!");
@@ -27,7 +29,7 @@ for (int i = 0; i < numOfPlayers; i++)
     lobby.AddPlayer(new(playerName, Console.ReadLine));
 }
 
-var game = new GameEngine(lobby.Players, Console.WriteLine);
+var game = new GameEngine(new MysteryNumberGenerator(), lobby.Players, Console.WriteLine);
 var gameResult = await game.Start(1, 10);
 
 if (gameResult.Error)
