@@ -1,5 +1,8 @@
 ﻿namespace Hilo.Core;
 
+/// <summary>
+/// Sets up a Game Lobby waiting for players to start a new game.
+/// </summary>
 public class GameLobby
 {
     /// <summary>

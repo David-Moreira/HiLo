@@ -5,7 +5,10 @@
 /// </summary>
 public enum GameErrorType
 {
+    None,
     Unexpected,
-    Aborted
+    Aborted,
+    InvalidArguments,
+    NoPlayers
 
 }

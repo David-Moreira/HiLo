@@ -5,6 +5,9 @@
 /// </summary>
 public class GameEngine
 {
+    private string ERROR_MIN = "Min range for mystery number can't be higher then provided max.";
+    private string ERROR_MAX = "Max range for mystery number can't be lower then provided min.";
+    private string ERROR_NO_PLAYERS = "No players to start the game.";
     private string ERROR_UNEXPECTED = "An unexpected error occurred.";
     private string ERROR_ABORTED = "Game was aborted.";
     private readonly IReadOnlyList<HiLoPlayer> _players;
@@ -27,10 +30,49 @@ public class GameEngine
         return _players.ElementAt(_nextPlayerIdx++);
     }
 
+    private void Reset()
+    {
+        _mysteryNumber = 0;
+        _nextPlayerIdx = 0;
+    }
+
+    /// <summary>
+    /// Validates if the game has valid arguments to start.
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    private (bool, GameResult) IsValidGame(int min, int max)
+    {
+        if (!_players?.Any() ?? true)
+            return (false, (GameResult.EndWithError(GameErrorType.NoPlayers, ERROR_UNEXPECTED)));
+
+        if (min > max)
+            return (false, (GameResult.EndWithError(GameErrorType.InvalidArguments, ERROR_MIN)));
+
+        if (max < min)
+            return (false, (GameResult.EndWithError(GameErrorType.InvalidArguments, ERROR_MAX)));
+
+        return (true, null);
+    }
+
+    /// <summary>
+    /// Starts a game with the provided players, generating a mystery number according to the provided min/max.
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public Task<GameResult> Start(int min, int max, CancellationToken cancellationToken = default)
     {
         try
         {
+            Reset();
+
+            var (valid, result) = IsValidGame(min, max);
+            if (!valid)
+                return Task.FromResult(result);
+
             _mysteryNumber = _mysteryNumberGenerator.Generate(min, max);
 
             _players.ElementAt(_nextPlayerIdx);
@@ -46,7 +88,7 @@ public class GameEngine
                 player.IncrementAttempt();
 
                 _output($"{player.Name}, Guess the number: ");
-
+                
                 var input = player.Input();
 
                 if (int.TryParse(input, out var parsedInput))
