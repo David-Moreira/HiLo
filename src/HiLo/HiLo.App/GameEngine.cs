@@ -1,70 +1,72 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-/// <summary>
+﻿/// <summary>
 /// HiLow Game engine, bootstraps the necessary components needed for the game to run.
 /// </summary>
 public class GameEngine
 {
+    private string ERROR_UNEXPECTED = "An unexpected error occurred.";
+    private string ERROR_ABORTED = "Game was aborted.";
     private readonly Func<string> _input;
     private readonly Action<string> _output;
     private int mysteryNumber;
 
-    public GameEngine( Func<string> Input, Action<string> Output )
+    public GameEngine(Func<string> Input, Action<string> Output)
     {
         _input = Input;
         _output = Output;
     }
 
-    public Task Start( int min, int max, CancellationToken cancellationToken = default )
+    public Task<GameResult> Start(int min, int max, CancellationToken cancellationToken = default)
     {
-        mysteryNumber = Random.Shared.Next( min, max );
-        var attempts = 0;
-        var win = false;
-        while ( true )
+        try
         {
-            if ( cancellationToken.IsCancellationRequested )
-                break;
-
-            attempts++;
-            _output( "Guess the number: " );
-
-            var input = _input();
-
-            if ( int.TryParse( input, out var parsedInput ) )
+            mysteryNumber = Random.Shared.Next(min, max);
+            var attempts = 0;
+            var win = false;
+            while (true)
             {
-                if ( mysteryNumber == parsedInput )
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    win = true;
-                    break;
+                    return Task.FromResult(GameResult.EndWithError(GameErrorType.Aborted, ERROR_ABORTED));
                 }
 
-                if ( mysteryNumber > parsedInput )
-                {
-                    _output( "LO" );
-                    continue;
-                }
+                attempts++;
+                _output("Guess the number: ");
 
-                if ( mysteryNumber < parsedInput )
-                {
-                    _output( "HI" );
-                    continue;
-                }
+                var input = _input();
 
+                if (int.TryParse(input, out var parsedInput))
+                {
+                    if (mysteryNumber == parsedInput)
+                    {
+                        return Task.FromResult(GameResult.End("Player 1", attempts));
+                    }
+
+                    if (mysteryNumber > parsedInput)
+                    {
+                        _output("LO");
+                        continue;
+                    }
+
+                    if (mysteryNumber < parsedInput)
+                    {
+                        _output("HI");
+                        continue;
+                    }
+
+
+                }
+                else
+                {
+                    _output("Please provide a valid number!");
+                }
 
             }
-            else
-            {
-                _output( "Please provide a valid number!" );
-            }
-
         }
-
-        if ( win )
-            _output( "Winner!" );
-
-        _output( $"Your attempts: {attempts}" );
-
-        return Task.CompletedTask;
+        catch (Exception)
+        {
+            //Log //Handle Error
+            return Task.FromResult(GameResult.EndWithError(GameErrorType.Unexpected, ERROR_UNEXPECTED));
+        }
 
     }
 }
